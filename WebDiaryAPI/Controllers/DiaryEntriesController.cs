@@ -18,9 +18,17 @@ namespace WebDiaryAPI.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<DiaryEntry> GetDiaryEntries() 
+        public async Task<ActionResult<IEnumerable<DiaryEntry>>> GetDiaryEntries() 
         {
-            return _context.DiaryEntries.ToList();
+            try 
+            {
+                return await _context.DiaryEntries.ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest($"Unable get DiaryEndtries: {ex.Message}");
+            }
+            
         }
     }
 }
