@@ -55,27 +55,75 @@ namespace WebDiaryAPI.Controllers
         {
             try
             {
-                bool doesIdExist = await _context.DiaryEntries.AnyAsync(entry => entry.EntryId == diaryEntry.EntryId);
-
-                if (doesIdExist)
-                {
-                    return Conflict(new
-                    {
-                        status = 409,
-                        error = "Conflict",
-                        message = "The ID you provided is already in use. Please try a different one.",
-                        details = new { id = diaryEntry.EntryId }
-                    });
-                }
+                diaryEntry.EntryId = 0;
 
                 _context.DiaryEntries.Add(diaryEntry);
+
                 await _context.SaveChangesAsync();
-                return diaryEntry;
+
+                var resourceUrl = Url.Action(nameof(GetDiaryEntryById), new { id = diaryEntry.EntryId });
+                return Created(resourceUrl, diaryEntry);
             }
             catch (Exception ex)
             {
                 return BadRequest($"Unable to add diary entry. \nError: {ex.Message} \n {ex.StackTrace}");
             }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> PutDiaryEntry(int id, [FromBody] DiaryEntry diaryEntry)
+        {
+            try
+            {
+                if (id != diaryEntry.EntryId)
+                {
+                    return BadRequest("The provided entry route Id does not match the body entryId.");
+                }
+
+                _context.Entry(diaryEntry).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                if (!DiaryEntryExists(id))
+                {
+                    return NotFound();
+                }
+
+                return BadRequest($"Unable to update diary entry. \nError: {ex.Message} \n {ex.StackTrace}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteDiaryEntry(int id)
+        {
+            try
+            {
+                DiaryEntry diaryEntry = await _context.DiaryEntries.FindAsync(id);
+
+                if (diaryEntry == null)
+                {
+                    return NotFound();
+                }
+
+                _context.DiaryEntries.Remove(diaryEntry);
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error: {ex.Message} \n {ex.StackTrace}");
+            }
+        }
+
+        private bool DiaryEntryExists(int id) 
+        { 
+            return _context.DiaryEntries.Any(entry => entry.EntryId == id);
         }
     }
 }
