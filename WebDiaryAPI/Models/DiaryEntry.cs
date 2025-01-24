@@ -5,7 +5,7 @@ namespace WebDiaryAPI.Models
     public class DiaryEntry
     {
         [Key]
-        public int Id { get; set; }
+        public int EntryId { get; set; }
 
         [Required]
         [StringLength(100, MinimumLength = 3)]
