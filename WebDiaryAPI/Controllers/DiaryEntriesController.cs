@@ -30,5 +30,25 @@ namespace WebDiaryAPI.Controllers
             }
             
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DiaryEntry>> GetDiaryEntryById(int id)
+        {
+            try
+            {
+                var diaryEntry = await _context.DiaryEntries.FindAsync(id);
+
+                if (diaryEntry == null) 
+                {
+                    return NotFound();
+                }
+
+                return diaryEntry;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Unable get DiaryEndtries: {ex.Message}");
+            }
+        }
     }
 }
