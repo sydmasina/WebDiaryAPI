@@ -117,7 +117,7 @@ namespace WebDiaryAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Unable to update diary entry. \nError: {ex.Message} \n {ex.StackTrace}");
+                return BadRequest($"Error: {ex.Message} \n {ex.StackTrace}");
             }
         }
 
