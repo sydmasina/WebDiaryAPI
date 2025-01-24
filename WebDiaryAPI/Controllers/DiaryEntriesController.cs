@@ -55,22 +55,14 @@ namespace WebDiaryAPI.Controllers
         {
             try
             {
-                bool doesIdExist = await _context.DiaryEntries.AnyAsync(entry => entry.EntryId == diaryEntry.EntryId);
-
-                if (doesIdExist)
-                {
-                    return Conflict(new
-                    {
-                        status = 409,
-                        error = "Conflict",
-                        message = "The ID you provided is already in use. Please try a different one.",
-                        details = new { id = diaryEntry.EntryId }
-                    });
-                }
+                diaryEntry.EntryId = 0;
 
                 _context.DiaryEntries.Add(diaryEntry);
+
                 await _context.SaveChangesAsync();
-                return diaryEntry;
+
+                var resourceUrl = Url.Action(nameof(GetDiaryEntryById), new { id = diaryEntry.EntryId });
+                return Created(resourceUrl, diaryEntry);
             }
             catch (Exception ex)
             {
