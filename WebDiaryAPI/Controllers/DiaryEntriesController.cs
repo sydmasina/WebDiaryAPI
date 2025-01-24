@@ -69,5 +69,61 @@ namespace WebDiaryAPI.Controllers
                 return BadRequest($"Unable to add diary entry. \nError: {ex.Message} \n {ex.StackTrace}");
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> PutDiaryEntry(int id, [FromBody] DiaryEntry diaryEntry)
+        {
+            try
+            {
+                if (id != diaryEntry.EntryId)
+                {
+                    return BadRequest("The provided entry route Id does not match the body entryId.");
+                }
+
+                _context.Entry(diaryEntry).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                if (!DiaryEntryExists(id))
+                {
+                    return NotFound();
+                }
+
+                return BadRequest($"Unable to update diary entry. \nError: {ex.Message} \n {ex.StackTrace}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteDiaryEntry(int id)
+        {
+            try
+            {
+                DiaryEntry diaryEntry = await _context.DiaryEntries.FindAsync(id);
+
+                if (diaryEntry == null)
+                {
+                    return NotFound();
+                }
+
+                _context.DiaryEntries.Remove(diaryEntry);
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Unable to update diary entry. \nError: {ex.Message} \n {ex.StackTrace}");
+            }
+        }
+
+        private bool DiaryEntryExists(int id) 
+        { 
+            return _context.DiaryEntries.Any(entry => entry.EntryId == id);
+        }
     }
 }
