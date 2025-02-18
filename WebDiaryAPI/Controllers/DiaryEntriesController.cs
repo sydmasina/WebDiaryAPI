@@ -102,7 +102,7 @@ namespace WebDiaryAPI.Controllers
         {
             try
             {
-                DiaryEntry diaryEntry = await _context.DiaryEntries.FindAsync(id);
+                var diaryEntry = await _context.DiaryEntries.FindAsync(id);
 
                 if (diaryEntry == null)
                 {
